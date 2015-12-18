@@ -1,0 +1,48 @@
+<td class="b9" valign="bottom" align="right" >
+    <select name="startyear" id="startyear" class="b9">
+        <%
+        for (int i=2000;i<=year+1;i++){
+        String sel=(i==syear)?"selected":"";
+        %>
+        <option value="<%=i%>" <%=sel%>><%=i%>
+        <%
+        }
+        %>
+    </select>
+</td>
+<td class="b9" valign="bottom" align="right" >
+    <select class="b9" id="startmonth" name="startmonth">
+        <%
+        for (int i=1;i<=12;i++){
+        String j=null;
+        if (i<=9){
+        j="0"+i;
+        }else{
+        j=""+i;
+        }
+        String sel=(i==smonth)?"selected":"";
+        %>
+        <option class="b9" value="<%=j%>" <%=sel%>><%=j%>
+        <%
+        }
+        %>
+    </select>
+</td>
+<td class="b9" valign="bottom" align="right" >
+    <select class="b9" id="startday" name="startday">
+        <%
+        for (int i=1;i<=31;i++){
+        String j=null;
+        if (i<=9){
+        j="0"+i;
+        }else{
+        j=""+i;
+        }
+        String sel=(i==sday)?"selected":"";
+        %>
+        <option class="b9" value="<%=j%>" <%=sel%>><%=j%>
+        <%
+        }
+        %>
+    </select>
+</td>

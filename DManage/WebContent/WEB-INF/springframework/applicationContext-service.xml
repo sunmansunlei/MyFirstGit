@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+    <!-- struts2's Action Mapping -->
+    <!-- 基础Action -->
+    <bean name="userService" class="com.sun.service.UserServiceImpl" >
+        <property name="sqlMapClientTemplate">  
+            <ref bean="sqlMapClientTemplate" />  
+        </property> 
+    </bean>
+    <bean name="menuService" class="com.sun.service.MenuServiceImpl" >
+        <property name="sqlMapClientTemplate">  
+            <ref bean="sqlMapClientTemplate" />  
+        </property> 
+    </bean>
+    
+    <bean name="VersionGrepService" class="com.sun.service.VersionGrepServiceImpl" >
+        <property name="sqlMapClientTemplate">  
+            <ref bean="sqlMapClientTemplate" />  
+        </property> 
+    </bean>
+</beans>

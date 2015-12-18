@@ -1,0 +1,16 @@
+<ghca>
+    <global>
+        <update>
+            <url>/ghca/version/</url>
+            <time>12</time> 
+        </update>
+        <message>
+            <url>/ghca/message/</url>
+            <time>30</time>
+        </message>
+        <control>
+            <url>/ghca/control/</url>
+            <time>60</time>
+        </control>
+    </global>
+</ghca>

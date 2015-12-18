@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+    <!-- 配置数据源,连接池采用的是c3p0，具体各参数代表意义参看c3p0自带的doc，非常详细。 -->
+    <bean id="dataSource"
+       class="com.mchange.v2.c3p0.ComboPooledDataSource"
+        destroy-method="close">
+        <property name="driverClass" value="${jdbc.driverClass}" />
+        <property name="jdbcUrl" value="${jdbc.url}" />
+        <property name="user" value="${jdbc.user}" />
+        <property name="password" value="${jdbc.password}" />
+        <property name="minPoolSize" value="${jdbc.minPoolSize}" />
+        <property name="maxPoolSize" value="${jdbc.maxPoolSize}" />
+        <property name="maxIdleTime" value="${jdbc.maxIdleTime}" />
+        <property name="acquireIncrement"
+            value="${jdbc.acquireIncrement}" />
+        <property name="maxStatements" value="${jdbc.maxStatements}" />
+        <property name="initialPoolSize"
+            value="${jdbc.initialPoolSize}" />
+        <property name="idleConnectionTestPeriod"
+            value="${jdbc.idleConnectionTestPeriod}" />
+        <property name="acquireRetryAttempts"
+            value="${jdbc.acquireRetryAttempts}" />
+    </bean>
+
+    <!-- 配置iBatis的sqlMapClient，这里当然是交给了spring去处理,其中，将SqlMapConfig文件放到了WEB-INF的iBatis目录下，也是便于管理 -->
+    <bean id="sqlMapClient"
+       class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+        <property name="configLocation">
+             <value>/WEB-INF/iBatis/SqlMapConfig.xml</value>  
+        </property>
+        <!-- 这里使用的数据源就是上面配置的数据源 -->
+        <property name="dataSource">
+            <ref bean="dataSource" />
+        </property>
+    </bean> 
+    
+    
+	<bean id="sqlMapClientTemplate"  
+		class="org.springframework.orm.ibatis.SqlMapClientTemplate"> 
+		<property name="sqlMapClient"> 
+		<ref bean="sqlMapClient" /> 
+		</property> 
+	</bean> 
+    
+
+   <!-- 上面的数据源的value值用的是表达式，原因就在这里，这将配置文件放到了iBatis目录下，也就是jdbc.properties，设置了c3p0的各项参数 -->
+    <bean id="propertyConfig"
+       class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location">
+            <value>/WEB-INF/iBatis/jdbc.properties</value>
+        </property>
+    </bean> 
+
+   <!-- 这个就是spring的事务管理了，采用的DataSource事务管理，要管理的DataSource当然也是上面配置的DataSource -->
+    <bean id="transactionManager"
+       class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource">
+            <ref bean="dataSource" />
+        </property>
+    </bean> 
+
+<!-- 事务管理的代理类，将其抽象化abstruct=true,以后需要进行事务管理直接继承此类就行了，非常方便 -->
+    <bean id="transactionProxy"
+       class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean" abstract="true">
+        <!-- 这个就是刚才配置的事务管理器 -->
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <!-- 下面是spring事务管理的策略，可以看到，凡是涉及数据库插入、修改的操作都应当以add、insert、edit、update、delete开头，这样才能由spring进行事务管理 -->
+        <property name="transactionAttributes">
+            <props>
+                <prop key="insert*">PROPAGATION_REQUIRED,-Exception</prop>
+                <prop key="add*">PROPAGATION_REQUIRED,-Exception</prop>
+                <prop key="update*">PROPAGATION_REQUIRED,-Exception</prop>
+                <prop key="edit*">PROPAGATION_REQUIRED,-Exception</prop>
+                <prop key="delete*">PROPAGATION_REQUIRED,-Exception</prop>
+                <prop key="find*">PROPAGATION_REQUIRED,readOnly</prop>
+                <prop key="query*">PROPAGATION_REQUIRED,readOnly</prop>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean> 
+
+    <!-- 这是项目中注册类，使用的sqlMapClient由spring去注入 
+    <bean id="registerDAO"
+        class="com.afl.register.service.dao.impl.RegisterDAOImpl">
+        <property name="sqlMapClient">
+            <ref bean="sqlMapClient" />
+        </property>
+        <property name="dataSource">
+            <ref bean="dataSource" />
+        </property>
+    </bean>  -->
+
+    <!-- 项目中，我将事务管理放到了service层上，因为dao只负责与数据库基本交互，在此项目中一般只操作一个表，无需事务。而service层上根据业务需要处理多表，因此将事务放在了service层上，其中的parent就是上面配置并abstract的代理 
+    <bean id="registerService" parent="transactionProxy">
+        <property name="target">
+            <bean class="com.afl.register.service.impl.RegisterServiceImpl">
+                <property name="registerDAO">
+                    <ref bean="registerDAO"/>
+                </property>
+            </bean>
+        </property>
+    </bean>
+    -->
+    
+</beans> 

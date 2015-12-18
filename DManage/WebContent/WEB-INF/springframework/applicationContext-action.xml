@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+    <!-- struts2's Action Mapping -->
+    <!-- 基础Action -->
+    <bean name="baseAction"
+        class="com.sun.struts.action.BaseAction" scope="prototype">
+        <property name="VersionGrepService">
+            <ref bean="VersionGrepService" />
+        </property>
+    </bean>
+     <bean name="loginAction"
+        class="com.sun.struts.action.LoginAction" scope="prototype">
+        <property name="userService">
+            <ref bean="userService" />
+        </property>
+    </bean>
+     <bean name="menuAction"
+        class="com.sun.struts.action.MenuAction" scope="prototype">
+        <property name="menuService">
+            <ref bean="menuService" />
+        </property>
+    </bean>
+     
+</beans>

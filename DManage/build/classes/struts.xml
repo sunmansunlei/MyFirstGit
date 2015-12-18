@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<struts>
+    <constant name="struts.devMode" value="true" />
+    <constant name="struts.custom.i18n.resources" value="XMessages"/>
+    <constant name="struts.i18n.encoding" value="UTF-8" />
+    <constant name="struts.objectFactory" value="spring" />
+    
+
+
+    <!-- struts2的action必须放在一个指定的包空间下定义 -->
+    <package name="login" extends="struts-default">
+
+        <global-results>
+            <result name="loginmain">/login_main.jsp</result>
+        </global-results>
+        <!-- 定义处理请求URL为login.action的Action -->
+        <action name="login" class="com.sun.struts.action.LoginAction">
+            <!-- 定义处理结果字符串和资源之间的映射关系 -->
+            <result name="success"  type="redirectAction">menu!getMenu</result>
+            <result name="error">/login.jsp</result>
+        </action>
+       
+        
+    </package>
+    
+    
+     <package name="menu" extends="struts-default">
+        <action name="menu" class="com.sun.struts.action.MenuAction">
+            <!-- 定义处理结果字符串和资源之间的映射关系 -->
+            <result name="success">/menu.jsp</result>
+        </action>
+     </package>
+    
+    
+   
+    
+</struts>

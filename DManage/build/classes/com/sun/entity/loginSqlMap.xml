@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="loginSqlMap"> 
+   
+ 
+    <select id="checkLogin" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		 			
+			SELECT   ot.operatorname,
+					 ot.passwd,
+					 ot.operatortype,
+					 ot.state,
+					 ot.citycode,
+           			 ot.operatorid
+			FROM operator_table ot 
+			WHERE  ot.state = 0 
+			AND ot.loginname = #login#
+			 
+		 
+	</select>
+	
+	
+	
+	
+	<select id="getMenu" parameterClass="java.util.Hashtable" resultClass="java.util.Hashtable">
+		  select id, name, layer 
+			from operatortopmenu  
+			where id in 
+			(select distinct father from operatormenu where id 
+			in (SELECT menuid FROM operatoracl WHERE groupid=#groupId# )) 
+			order by layer,id 
+					
+	</select>
+	
+	
+	<select id="getTopSubMenu"  parameterClass="java.util.Hashtable" resultClass="java.util.Hashtable">
+			select  distinct o.id,
+					#groupId# as groupid,
+					o.name,'' as url,
+					o.father,o.layer,
+					0 as width,
+					0 as height,
+					0 as menutype 
+			from operatortopsubmenu o,operatormenutomenu om,operatoracl a 
+			where om.fatherid=o.id 
+			and om.subid=a.menuid 
+			and o.father=#id#
+			and a.groupid=#groupId#
+			union all 
+			select b.id,a.groupid,  b.name, b.url, b.father, b.layer, b.width, b.height,1 as menutype 
+			from operatoracl a, operatormenu b 
+			where a.menuid = b.id 
+			and a.groupid = #groupId# 
+			and b.father=#id# 
+			and id not in 
+			(select subid from operatormenutomenu where FATHERID in 
+				(select id from operatortopsubmenu where father=#id#)) 
+			order by menutype,layer,id
+			
+	</select>
+	
+	
+	<select id="getSubMenu"  parameterClass="java.util.Hashtable" resultClass="java.util.Hashtable">
+				select  a.groupid,
+						a.citycode,
+						a.id,
+						a.name,
+						a.url,
+						a.father,
+						a.layer,
+						a.width,
+						a.height,
+						1 as menutype 
+					from menu_view a,operatormenutomenu b
+		                   where a.citycode = #city1#
+		                   and a.groupid = #groupId#
+		                   and a.id = b.subid 
+		                   and b.fatherid = #id#
+		                   order by b.layer, a.id 
+
+	</select>
+	
+	
+		
+	<select id="getTopMenu" parameterClass="java.util.Hashtable" resultClass="java.util.Hashtable">
+	  	select  id,
+			    name,
+			    layer 
+			    from operatortopmenu 
+          where id in 
+              		(select distinct father from operatormenu where id in 
+              				(SELECT menuid FROM operatoracl WHERE groupid=#groupId# )) 
+           order by layer,id  
+					
+	</select>
+	
+	
+	
+	<select id="getCity"  resultClass="java.util.Hashtable">
+		 			
+		  select pf_getcitylevel(citycode) as levels,
+		       pf_getcity(citycode) as topcity,
+		       citycode,
+		       cityname,
+		       father
+		  from city_table
+		  order by pf_getcitystr(citycode)
+		 
+	</select>
+	
+	<select id="getSchool"  parameterClass="java.lang.String" resultClass="java.util.HashMap">
+		 			
+		   select schoolid, schoolname, citycode, branchid, prefix, suffix
+			  from school_table
+		   where 1 = 1
+		    <dynamic>
+			   	   	<isNotEmpty property="value">
+				      AND citycode = #value#
+				   </isNotEmpty>
+			</dynamic>
+		 
+	</select>
+	
+</sqlMap>
